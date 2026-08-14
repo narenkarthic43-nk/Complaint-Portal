@@ -670,6 +670,32 @@
     }
   }
 
+  async function updateComplaintOnSupabase(ticketId, updateData) {
+    try {
+      const payload = {
+        updated_at: new Date().toISOString()
+      };
+      if (updateData.status) payload.status = updateData.status;
+      if (updateData.afterPhoto) payload.after_photo = updateData.afterPhoto;
+      if (updateData.workerNotes) payload.worker_notes = updateData.workerNotes;
+      if (updateData.adminMessage) payload.admin_message = updateData.adminMessage;
+      if (updateData.rejectionReason) payload.rejection_reason = updateData.rejectionReason;
+
+      await fetch(`${SUPABASE_REST_BASE}/complaints?id=eq.${ticketId}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      console.warn('Supabase PATCH error:', e);
+    }
+  }
+
   function updateApiStatusBadge(online, customText) {
     const badge = document.getElementById('api-status-badge');
     if (badge) {
@@ -1326,6 +1352,11 @@
           item.updatedAt = new Date().toISOString();
 
           saveComplaintsData();
+          updateComplaintOnSupabase(ticketId, {
+            status: 'Pending Verification',
+            afterPhoto: item.afterPhoto,
+            workerNotes: item.workerNotes
+          });
           updateGlobalCounters();
           renderWorkerPortal();
           renderTrackPortal();
@@ -2067,6 +2098,7 @@
           item.verifiedAt = new Date().toISOString();
           item.updatedAt = new Date().toISOString();
           saveComplaintsData();
+          updateComplaintOnSupabase(ticketId, { status: 'Verified Closed' });
           updateGlobalCounters();
           renderAdminPortal();
           renderWorkerPortal();
