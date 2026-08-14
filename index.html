@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiruchengode Municipal Corporation Portal</title>
+  <meta name="description"
+    content="Public citizen complaint registration, ward worker field updates, live GPS mapping, and admin verification platform.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Leaflet CSS for Map Selector -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- EmailJS Browser SDK for Real Gmail Dispatch -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <!-- Firebase Cloud Database SDK (App & Realtime Database) for Cross-Device Cloud Sync -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Top App Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+
+      <!-- LEFT SIDE: Tamil Nadu State Emblem + Title -->
+      <div class="header-brand-group">
+        <img
+          src="https://w7.pngwing.com/pngs/408/625/png-transparent-government-of-tamil-nadu-seal-of-tamil-nadu-tamil-nadu-legislative-assembly-state-emblem-of-india-others-miscellaneous-emblem-food.png"
+          alt="Tamil Nadu Emblem" class="header-emblem-left" title="Government of Tamil Nadu - Civic Redressal">
+
+        <a href="#" class="logo-group" id="app-logo">
+          <div class="logo-title">
+            <h1>Tiruchengode Municipal Corporation Portal</h1>
+            <p>⭐ Municipal Grievance System ⭐</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- CENTER: Portal Navigation Tabs -->
+      <nav class="nav-portals" aria-label="Portal Navigation">
+        <button class="portal-tab active" data-portal="public-portal" id="tab-public">
+          <span>📢</span> Public Portal
+        </button>
+        <button class="portal-tab" data-portal="track-portal" id="tab-track">
+          <span>🔍</span> Track Status
+        </button>
+        <button class="portal-tab" data-portal="worker-portal" id="tab-worker">
+          <span>👷</span> Worker Portal
+        </button>
+        <button class="portal-tab" data-portal="admin-portal" id="tab-admin">
+          <span>🏛️</span> Admin Portal
+        </button>
+      </nav>
+
+      <!-- RIGHT SIDE: TVK Vijay Emblem -->
+      <div class="header-actions">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/hd_webp/aedc9a231551781.688b3c22f2b33.png"
+          alt="TVK Emblem" class="header-emblem-right" title="Tamilaga Vettri Kazhagam - Victory Banner">
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Portal Views Container -->
+  <main class="app-content">
+
+    <!-- 1. PUBLIC CITIZEN PORTAL -->
+    <section id="public-portal" class="portal-section active">
+      <div class="hero-banner">
+        <div class="hero-text">
+          <h2>Register Your Civic Complaint</h2>
+          <p>Report neighborhood issues like garbage dumps, broken roads, or streetlight outages directly to municipal
+            authorities with exact live location pin.</p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-box">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">Reported</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="stat-resolved" style="color: var(--accent-emerald);">0</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Complaint Registration Form Card -->
+        <div class="card">
+          <div class="card-title">
+            <span>📝</span> Citizen Complaint Form
+          </div>
+
+          <form id="public-complaint-form">
+            <!-- Ward Selection (ONLY WARD NAME SHOWN) -->
+            <div class="form-group">
+              <label for="public-ward">Select Ward <span class="required">*</span></label>
+              <select id="public-ward" required>
+                <option value="" disabled selected>-- Select Ward --</option>
+                <option value="Ward 1">Ward 1</option>
+                <option value="Ward 2">Ward 2</option>
+                <option value="Ward 3">Ward 3</option>
+                <option value="Ward 4">Ward 4</option>
+                <option value="Ward 5">Ward 5</option>
+                <option value="Ward 6">Ward 6</option>
+                <option value="Ward 7">Ward 7</option>
+                <option value="Ward 8">Ward 8</option>
+                <option value="Ward 9">Ward 9</option>
+                <option value="Ward 10">Ward 10</option>
+              </select>
+            </div>
+
+            <!-- Complaint Category -->
+            <div class="form-group">
+              <label for="public-category">Complaint Type / Category <span class="required">*</span></label>
+              <select id="public-category" required>
+                <option value="" disabled selected>-- Select Issue Category --</option>
+                <option value="Garbage & Waste Disposal">🗑️ Garbage & Waste Accumulation</option>
+                <option value="Road Pothole & Damage">🛣️ Pothole & Road Damage</option>
+                <option value="Streetlight Failure">💡 Streetlight Outage / Broken Light</option>
+                <option value="Water Supply Leakage">🚰 Water Supply Pipe Leakage</option>
+                <option value="Drainage & Sewage Overflow">🌧️ Drainage & Sewage Blockage</option>
+                <option value="Stray Animal & Pest Control">🐕 Stray Animal Hazard</option>
+                <option value="Unauthorized Encroachment">🚧 Illegal Construction & Obstruction</option>
+              </select>
+            </div>
+
+            <!-- Detailed Problem Description -->
+            <div class="form-group">
+              <label for="public-problem">Describe the Problem <span class="required">*</span></label>
+              <textarea id="public-problem" rows="3"
+                placeholder="Provide exact details of the problem (e.g. Garbage dumped near main road causing odor)..."
+                required></textarea>
+            </div>
+
+            <!-- Live Geolocation & Map Pin Selector -->
+            <div class="form-group">
+              <label>Live Location & Map Pin (Visible to Workers & Admins) <span class="required">*</span></label>
+              <div class="location-box">
+                <div class="location-btn-row">
+                  <button type="button" class="btn-secondary" id="btn-get-gps">
+                    📍 Detect My Live GPS Location
+                  </button>
+                  <span id="gps-status" style="font-size: 0.8rem; color: var(--text-gold); align-self: center;"></span>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                  <input type="text" id="public-location-address"
+                    placeholder="Address or Landmark (e.g., Near Bus Stand, Main Street)" required>
+                </div>
+
+                <!-- Leaflet Interactive Map -->
+                <div id="map-picker-container"></div>
+                <input type="hidden" id="public-lat" value="11.3800">
+                <input type="hidden" id="public-lng" value="77.8946">
+              </div>
+            </div>
+
+            <!-- Before Photo Upload (Multi-Photo Support) -->
+            <div class="form-group">
+              <label>Upload BEFORE Photos (Attach up to 4 Photos) <span class="required">*</span></label>
+              <div class="file-upload-zone" id="before-upload-zone">
+                <input type="file" id="public-before-photo" accept="image/*" multiple>
+                <div class="upload-icon">📷</div>
+                <div style="font-weight: 700;">Click or Drag BEFORE Photos (Select Multiple)</div>
+                <div style="font-size: 0.75rem; color: var(--text-gold); margin-top: 4px;">JPG, PNG, WEBP — Select up to 4 angles (Auto-compressed)
+                </div>
+              </div>
+              <div id="before-preview-container" class="multi-preview-grid" style="display: none; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.75rem;">
+                <!-- Multi-photo previews rendered dynamically -->
+              </div>
+              <div style="margin-top: 0.5rem;">
+                <button type="button" class="btn-secondary" id="btn-quick-before-photo"
+                  style="width: 100%; justify-content: center; font-size: 0.82rem;">
+                  ⚡ Generate Sample BEFORE Photos (Instant Multi-Photo Demo)
+                </button>
+              </div>
+            </div>
+
+            <!-- Complainant Identity -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="public-name">Your Full Name <span class="required">*</span></label>
+                <input type="text" id="public-name" placeholder="e.g., Ramesh Kumar" required>
+              </div>
+              <div class="form-group">
+                <label for="public-mobile">Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="public-mobile" placeholder="10-digit mobile number (e.g. 9876543210)" maxlength="15" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="btn-submit-complaint">
+              <span>🚀</span> Submit Registration & Get Ticket
+            </button>
+          </form>
+        </div>
+
+        <!-- Right Side: Recent Complaints & Receipt Card Container -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+          <!-- Registration Receipt Container -->
+          <div id="receipt-container" style="display: none;">
+            <div class="receipt-card">
+              <div style="font-size: 2.5rem;">✅</div>
+              <h3 style="font-size: 1.3rem; margin-top: 0.2rem;">Complaint Successfully Registered!</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Save your reference ticket ID for status
+                tracking:</p>
+
+              <div class="receipt-code" id="receipt-id-display">CMP-2026-0000</div>
+
+              <div
+                style="text-align: left; background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px; font-size: 0.85rem; margin: 1rem 0; border: 1px solid var(--accent-gold);">
+                <div><strong>Ward:</strong> <span id="receipt-ward">--</span></div>
+                <div><strong>Category:</strong> <span id="receipt-category">--</span></div>
+                <div><strong>Location:</strong> <span id="receipt-location">--</span></div>
+                <div><strong>Date & Time:</strong> <span id="receipt-time">--</span></div>
+                <div><strong>Status:</strong> <span class="badge badge-registered">Registered</span></div>
+              </div>
+
+              <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                <button type="button" class="btn-secondary" id="btn-copy-ticket">📋 Copy Ticket ID</button>
+                <button type="button" class="btn-secondary" id="btn-track-this">🔍 Track Ticket</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Public Instructions & Help Card -->
+          <div class="card">
+            <div class="card-title">
+              <span>ℹ️</span> Live Geolocation & Fix Process
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem; font-size: 0.9rem;">
+              <div style="display: flex; gap: 0.75rem;">
+                <div
+                  style="background: var(--primary-light); color: var(--accent-gold); font-weight: 800; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--accent-gold);">
+                  1</div>
+                <div>
+                  <strong>Live Geolocation Pin</strong>
+                  <div style="color: var(--text-muted); font-size: 0.8rem;">Clicking "Detect My Live GPS Location"
+                    records precise coordinates so field workers navigate straight to the spot.</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.75rem;">
+                <div
+                  style="background: var(--primary-light); color: var(--accent-gold); font-weight: 800; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--accent-gold);">
+                  2</div>
+                <div>
+                  <strong>Worker Ward-Specific Queue</strong>
+                  <div style="color: var(--text-muted); font-size: 0.8rem;">Workers log in and only receive complaints
+                    registered within their assigned Ward for field resolution.</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.75rem;">
+                <div
+                  style="background: var(--primary-light); color: var(--accent-gold); font-weight: 800; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--accent-gold);">
+                  3</div>
+                <div>
+                  <strong>Step-by-Step Resolution Tracking</strong>
+                  <div style="color: var(--text-muted); font-size: 0.8rem;">Enter Mobile Number on Track Status tab to
+                    watch your complaint move through all 4 resolution stages live!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TRACK COMPLAINT STATUS PORTAL -->
+    <section id="track-portal" class="portal-section">
+      <div class="card">
+        <div class="card-title">
+          <span>🔍</span> Public Complaint Tracking & Step-by-Step Progress
+        </div>
+
+        <div style="max-width: 800px; margin: 0 auto; padding: 1rem 0;">
+          <div
+            style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; border: 1px dashed var(--accent-gold); margin-bottom: 1.5rem;">
+            <label for="track-search-input" style="color: var(--text-gold); font-size: 0.95rem; margin-bottom: 0.5rem;">
+              📱 Enter Your Registered Mobile Number (or Ticket ID):
+            </label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" id="track-search-input"
+                placeholder="Enter 10-digit mobile number (e.g. 9876543210)...">
+              <button type="button" class="btn-primary" id="btn-track-search"
+                style="width: auto; padding: 0 1.5rem; flex-shrink: 0;">
+                🔍 Lookup Complaints
+              </button>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
+              Enter your mobile number to view all complaints registered under your number with step-by-step 4-stage
+              resolution process tracking.
+            </div>
+          </div>
+
+          <div id="track-results-container">
+            <!-- Complaints list with step-by-step stepper rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. WORKER FIELD PORTAL -->
+    <section id="worker-portal" class="portal-section">
+
+      <!-- WORKER LOGIN VIEW -->
+      <div id="worker-login-view" class="auth-login-container">
+        <div class="card">
+          <div class="card-title" style="justify-content: center;">
+            <span>🔐</span> Field Worker Ward Action Login
+          </div>
+
+          <form id="worker-login-form">
+            <div class="form-group">
+              <label for="worker-login-username">Worker Username <span class="required">*</span></label>
+              <input type="text" id="worker-login-username" value="worker1"
+                placeholder="Enter your username (e.g. worker1)" required>
+            </div>
+
+            <div class="form-group">
+              <label for="worker-login-password">Worker Password <span class="required">*</span></label>
+              <input type="password" id="worker-login-password" value="pass123" placeholder="Enter your password"
+                required>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 1rem;">
+              🔑 Log In to Worker Portal
+            </button>
+          </form>
+
+          <div
+            style="margin-top: 1.25rem; background: rgba(0,0,0,0.3); padding: 0.9rem; border-radius: 8px; font-size: 0.82rem; border: 1px dashed var(--accent-gold); text-align: center;">
+            <div style="color: var(--text-gold); font-weight: 700; margin-bottom: 6px;">⚡ Quick Ward-Specific Worker
+              Access:</div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              <button type="button" class="btn-secondary" id="btn-quick-login-worker1"
+                style="justify-content: center; width: 100%;">
+                👤 Log In as Worker Ramesh (Ward 1 Only)
+              </button>
+              <button type="button" class="btn-secondary" id="btn-quick-login-worker2"
+                style="justify-content: center; width: 100%;">
+                👤 Log In as Worker Suresh (Ward 3 Only)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WORKER DASHBOARD VIEW -->
+      <div id="worker-dashboard-view" style="display: none;">
+        <div class="auth-session-bar">
+          <div>
+            <span style="font-weight: 800; font-size: 1.1rem; color: #ffffff;">👤 Active Worker: <span
+                id="worker-session-name" style="color: var(--text-gold);">Ramesh Kumar</span></span>
+            <span style="font-size: 0.88rem; color: var(--accent-gold); margin-left: 0.75rem;">(Assigned: <strong
+                id="worker-session-ward">Ward 1</strong> ONLY)</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <span style="font-size: 0.8rem; color: var(--text-gold); font-weight: 700;">🔒 Ward Restricted Queue</span>
+            <button type="button" class="btn-secondary" id="btn-worker-logout"
+              style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+              🔑 Switch Worker Account
+            </button>
+          </div>
+        </div>
+
+        <div class="hero-banner">
+          <div class="hero-text">
+            <h2>👷 Worker Assigned Ward Action Queue</h2>
+            <p>Access ONLY your assigned Ward complaints, view live GPS location maps for turn-by-turn navigation, and
+              upload mandatory AFTER photos upon repair completion.</p>
+          </div>
+        </div>
+
+        <!-- WORKER EXECUTIVE WARD METRICS GRID -->
+        <div class="admin-metrics-grid" style="margin-bottom: 1.5rem;">
+          <div class="card" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: var(--text-gold); text-transform: uppercase;">Total Assigned</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #ffffff;" id="worker-stat-total">0</div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: var(--text-gold); text-transform: uppercase;">Pending Action</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-amber);" id="worker-stat-registered">0</div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: var(--text-gold); text-transform: uppercase;">In Progress</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8;" id="worker-stat-progress">0</div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: var(--text-gold); text-transform: uppercase;">Pending Verification</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: #c7d2fe;" id="worker-stat-pending-verify">0</div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1rem;">
+            <div style="font-size: 0.78rem; color: var(--text-gold); text-transform: uppercase;">Verified & Closed</div>
+            <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent-emerald);" id="worker-stat-verified">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span>📋</span> Assigned Ward Complaints Queue
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+              <!-- Master Table Mode Indicator -->
+              <span class="badge" style="background: rgba(220,38,38,0.25); color: #fef08a; border: 1px solid var(--accent-gold); font-size: 0.82rem;">
+                📊 Master Table View Only
+              </span>
+
+              <!-- Queue Status Filter Dropdown -->
+              <select id="worker-filter-status" style="width: auto; padding: 0.35rem 0.65rem; font-size: 0.8rem; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--border-color); border-radius: 6px;">
+                <option value="ALL">Status: All</option>
+                <option value="Registered">Registered (New)</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Pending Verification">Pending Verification</option>
+                <option value="Verified Closed">Verified Closed</option>
+              </select>
+
+              <!-- Queue Filters -->
+              <button type="button" class="btn-secondary" id="btn-worker-filter-all"
+                style="padding: 0.3rem 0.7rem; font-size: 0.78rem; background: rgba(255,255,255,0.15);">
+                📋 All Tickets
+              </button>
+              <button type="button" class="btn-secondary" id="btn-worker-filter-directives"
+                style="padding: 0.3rem 0.7rem; font-size: 0.78rem; border-color: var(--accent-gold); color: var(--text-gold);">
+                ⚡ Directives
+              </button>
+              <span class="badge badge-inprogress" id="worker-task-count">0 Complaints</span>
+            </div>
+          </div>
+
+          <!-- ADMIN-STYLE MASTER TABLE VIEW FOR WORKER PORTAL (EXCLUSIVE DISPLAY) -->
+          <div id="worker-tickets-table-container" class="table-responsive" style="margin-top: 1rem;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Ticket ID</th>
+                  <th>Ward & Location</th>
+                  <th>Category & Problem</th>
+                  <th>Complainant</th>
+                  <th>Live Map</th>
+                  <th>Before / After Photos</th>
+                  <th>Status</th>
+                  <th>Worker Action</th>
+                </tr>
+              </thead>
+              <tbody id="worker-table-body">
+                <!-- Worker table rows rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 4. ADMIN VERIFICATION PORTAL -->
+    <section id="admin-portal" class="portal-section">
+
+      <!-- ADMIN LOGIN VIEW (Official Website Access: tiruchengodemunico@gmail.com) -->
+      <div id="admin-login-view" class="auth-login-container">
+        <div class="card">
+          <div class="card-title" style="justify-content: center;">
+            <span>🏛️</span> Master Admin Main Work Access Login
+          </div>
+
+          <form id="admin-login-form">
+            <div class="form-group">
+              <label for="admin-login-email">Master Admin Email Address <span class="required">*</span></label>
+              <input type="email" id="admin-login-email" value="narenkarthic34@gmail.com"
+                placeholder="narenkarthic34@gmail.com" required>
+            </div>
+
+            <div class="form-group">
+              <label for="admin-login-password">Master Admin Password <span class="required">*</span></label>
+              <input type="password" id="admin-login-password" value="Tiruchengode@2026" placeholder="Enter password"
+                required>
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 0.5rem;">
+              🔑 Log In to Master Admin Control Desk
+            </button>
+          </form>
+
+          <div
+            style="margin-top: 1.25rem; background: rgba(0,0,0,0.3); padding: 0.9rem; border-radius: 8px; font-size: 0.82rem; border: 1px dashed var(--accent-gold); text-align: center;">
+            <div style="color: var(--text-gold); font-weight: 700; margin-bottom: 4px;">📧 Master Work Access Admin Credentials:</div>
+            <div>Admin Email: <strong>narenkarthic34@gmail.com</strong> / <strong>tiruchengodemunico@gmail.com</strong></div>
+            <div>Password: <strong>Tiruchengode@2026</strong></div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+              <button type="button" class="btn-secondary" id="btn-send-admin-pass"
+                style="font-size: 0.8rem; flex: 1; justify-content: center;">
+                🔑 Password Login
+              </button>
+              <button type="button" class="btn-primary" id="btn-send-admin-otp"
+                style="font-size: 0.8rem; flex: 1.2; justify-content: center; padding: 0.5rem 0.8rem;">
+                📩 Send 6-Digit OTP to Email
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN DASHBOARD VIEW -->
+      <div id="admin-dashboard-view" style="display: none;">
+
+        <!-- Active Admin Session Header Bar -->
+        <div class="auth-session-bar">
+          <div>
+            <span style="font-weight: 800; font-size: 1.1rem; color: #ffffff;">🏛️ Master Work Access Session: <span
+                id="admin-session-email-display" style="color: var(--text-gold);">tiruchengodemunico@gmail.com</span></span>
+            <span style="font-size: 0.85rem; color: var(--accent-emerald); margin-left: 0.75rem;">(Chief Municipal
+              Administrator)</span>
+          </div>
+          <button type="button" class="btn-secondary" id="btn-admin-logout"
+            style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+            🔒 Logout Master Admin
+          </button>
+        </div>
+
+        <div class="hero-banner">
+          <div class="hero-text">
+            <h2>🏛️ Municipal Admin Verification & Control Desk</h2>
+            <p>Register field workers with usernames/passwords, inspect incoming complaints, view live GPS location
+              pins, inspect side-by-side Before vs After photos, and verify resolutions.</p>
+          </div>
+        </div>
+
+        <!-- ADMIN WORKER MANAGEMENT CARD -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <div class="card-title">
+            <span>👷‍♂️</span> Admin Worker Registration & Access Control Desk
+          </div>
+
+          <div class="grid-2">
+            <!-- Add Worker Form -->
+            <form id="admin-add-worker-form">
+              <h4 style="color: var(--text-gold); margin-bottom: 0.75rem; font-size: 1rem;">Register New Field Worker
+              </h4>
+
+              <div class="form-group">
+                <label for="admin-worker-name">Worker Full Name <span class="required">*</span></label>
+                <input type="text" id="admin-worker-name" placeholder="e.g. Ramesh Worker" required>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="admin-worker-username">Username <span class="required">*</span></label>
+                  <input type="text" id="admin-worker-username" placeholder="e.g. worker_ward4" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="admin-worker-password">Password <span class="required">*</span></label>
+                  <input type="password" id="admin-worker-password" placeholder="Set password" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="admin-worker-ward">Assign Ward <span class="required">*</span></label>
+                  <select id="admin-worker-ward" required>
+                    <option value="Ward 1">Ward 1</option>
+                    <option value="Ward 2">Ward 2</option>
+                    <option value="Ward 3">Ward 3</option>
+                    <option value="Ward 4">Ward 4</option>
+                    <option value="Ward 5">Ward 5</option>
+                    <option value="Ward 6">Ward 6</option>
+                    <option value="Ward 7">Ward 7</option>
+                    <option value="Ward 8">Ward 8</option>
+                    <option value="Ward 9">Ward 9</option>
+                    <option value="Ward 10">Ward 10</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="admin-worker-mobile">Worker Mobile <span class="required">*</span></label>
+                  <input type="tel" id="admin-worker-mobile" placeholder="10-digit mobile" pattern="[0-9]{10}"
+                    maxlength="10" required>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-success" style="width: 100%; padding: 0.75rem;">
+                ➕ Add Worker Account
+              </button>
+            </form>
+
+            <!-- Registered Workers List Table -->
+            <div>
+              <h4 style="color: var(--text-gold); margin-bottom: 0.75rem; font-size: 1rem;">Registered Field Workers
+                Directory</h4>
+
+              <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
+                <table class="admin-table" style="font-size: 0.82rem;">
+                  <thead>
+                    <tr>
+                      <th>Worker Name</th>
+                      <th>Ward</th>
+                      <th>Username</th>
+                      <th>Password</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="admin-workers-table-body">
+                    <!-- Registered workers rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Executive Metrics -->
+        <div class="admin-metrics-grid">
+          <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 0.8rem; color: var(--text-gold); text-transform: uppercase;">Total Complaints</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #ffffff;" id="admin-stat-total">0</div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 0.8rem; color: var(--text-gold); text-transform: uppercase;">Pending Action</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-amber);" id="admin-stat-registered">0
+            </div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 0.8rem; color: var(--text-gold); text-transform: uppercase;">In Progress</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #38bdf8;" id="admin-stat-progress">0</div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 0.8rem; color: var(--text-gold); text-transform: uppercase;">Pending Admin Verify
+            </div>
+            <div style="font-size: 2rem; font-weight: 800; color: #c7d2fe;" id="admin-stat-pending-verify">0</div>
+          </div>
+          <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 0.8rem; color: var(--text-gold); text-transform: uppercase;">Verified & Closed</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-emerald);" id="admin-stat-verified">0
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Management Table Card -->
+        <div class="card">
+          <div class="card-title admin-table-header-title">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span>🗂️</span> Complaint Verification Master List
+            </div>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <select id="admin-filter-status" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                <option value="ALL">Filter Status: All</option>
+                <option value="Pending Verification" selected>Pending Admin Verification</option>
+                <option value="Registered">Registered (New)</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Verified Closed">Verified & Closed</option>
+              </select>
+              <select id="admin-filter-ward" style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                <option value="ALL">Filter Ward: All</option>
+                <option value="Ward 1">Ward 1</option>
+                <option value="Ward 2">Ward 2</option>
+                <option value="Ward 3">Ward 3</option>
+                <option value="Ward 4">Ward 4</option>
+                <option value="Ward 5">Ward 5</option>
+                <option value="Ward 6">Ward 6</option>
+                <option value="Ward 7">Ward 7</option>
+                <option value="Ward 8">Ward 8</option>
+                <option value="Ward 9">Ward 9</option>
+                <option value="Ward 10">Ward 10</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Ticket ID</th>
+                  <th>Ward & Location</th>
+                  <th>Category</th>
+                  <th>Complainant</th>
+                  <th>Live Map</th>
+                  <th>Before / After Photos</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body">
+                <!-- Admin table rows rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL: ADMIN EDIT WORKER DETAILS -->
+  <div class="modal-overlay" id="admin-edit-worker-modal">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">✏️ Edit Worker Credentials & Details</div>
+        <button class="close-modal-btn" id="btn-close-edit-worker-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="admin-edit-worker-form">
+          <input type="hidden" id="edit-worker-original-username">
+
+          <div class="form-group">
+            <label for="edit-worker-name">Worker Full Name <span class="required">*</span></label>
+            <input type="text" id="edit-worker-name" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-worker-username">Username <span class="required">*</span></label>
+              <input type="text" id="edit-worker-username" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-worker-password">Password <span class="required">*</span></label>
+              <input type="text" id="edit-worker-password" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-worker-ward">Assigned Ward <span class="required">*</span></label>
+              <select id="edit-worker-ward" required>
+                <option value="Ward 1">Ward 1</option>
+                <option value="Ward 2">Ward 2</option>
+                <option value="Ward 3">Ward 3</option>
+                <option value="Ward 4">Ward 4</option>
+                <option value="Ward 5">Ward 5</option>
+                <option value="Ward 6">Ward 6</option>
+                <option value="Ward 7">Ward 7</option>
+                <option value="Ward 8">Ward 8</option>
+                <option value="Ward 9">Ward 9</option>
+                <option value="Ward 10">Ward 10</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-worker-mobile">Mobile Number <span class="required">*</span></label>
+              <input type="tel" id="edit-worker-mobile" pattern="[0-9]{10}" maxlength="10" required>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+            <button type="button" class="btn-secondary" id="btn-cancel-edit-worker">Cancel</button>
+            <button type="submit" class="btn-success">💾 Save Worker Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LIVE GEOLOCATION MAP VIEW FOR WORKERS & ADMINS -->
+  <div class="modal-overlay" id="live-location-modal">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <div class="modal-title">📍 Complaint Live Geolocation Map</div>
+        <button class="close-modal-btn" id="btn-close-map-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 0.75rem;">
+          <div style="font-weight: 800; font-size: 1.1rem; color: var(--text-gold);" id="modal-map-ticket-id">Ticket #--
+          </div>
+          <div style="color: #ffffff; font-size: 0.88rem;" id="modal-map-address">📍 Address: --</div>
+          <div style="font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; margin-top: 2px;"
+            id="modal-map-coords">GPS: --</div>
+        </div>
+
+        <div id="live-location-modal-map"></div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem; justify-content: flex-end;">
+          <a href="#" target="_blank" class="btn-primary" id="btn-open-google-maps"
+            style="width: auto; text-decoration: none;">
+            🗺️ Open Turn-by-Turn Directions in Google Maps
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WORKER AFTER-PHOTO UPLOAD DIALOGUE -->
+  <div class="modal-overlay" id="worker-upload-modal">
+    <div class="modal-box" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title">👷 Complete Work & Upload AFTER Photo</div>
+        <button class="close-modal-btn" id="btn-close-worker-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="worker-complete-form">
+          <input type="hidden" id="modal-worker-ticket-id">
+
+          <div
+            style="background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; border: 1px solid var(--border-color);">
+            <div><strong>Ticket:</strong> <span id="modal-worker-ticket-code" style="color: var(--text-gold);">--</span>
+            </div>
+            <div><strong>Category:</strong> <span id="modal-worker-cat">--</span></div>
+            <div><strong>Address:</strong> <span id="modal-worker-address">--</span></div>
+          </div>
+
+          <!-- BEFORE Photo Reference -->
+          <div style="margin-bottom: 1rem;">
+            <label>BEFORE Photo Reference (Citizen Uploaded):</label>
+            <img id="modal-worker-before-img" src="" alt="Before Photo"
+              style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);">
+          </div>
+
+          <!-- MANDATORY AFTER PHOTO UPLOAD (Multi-Photo Support) -->
+          <div class="form-group">
+            <label>Upload AFTER Photos (Attach up to 4 Resolution Proof Photos) <span class="required">*</span></label>
+            <div class="file-upload-zone" id="after-upload-zone">
+              <input type="file" id="worker-after-photo" accept="image/*" multiple>
+              <div class="upload-icon">📸</div>
+              <div style="font-weight: 700;">Click or Drag AFTER Photos of Resolved Work (Select Multiple)</div>
+              <div style="font-size: 0.75rem; color: var(--text-gold); margin-top: 4px;">JPG, PNG, WEBP — Select up to 4 completion photos</div>
+            </div>
+            <div id="after-preview-container" class="multi-preview-grid" style="display: none; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.75rem;">
+              <!-- Multi-photo previews rendered dynamically -->
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <button type="button" class="btn-secondary" id="btn-quick-after-photo"
+                style="width: 100%; justify-content: center; font-size: 0.82rem;">
+                ⚡ Generate Sample AFTER Photos (Instant Multi-Photo Demo)
+              </button>
+            </div>
+          </div>
+
+          <!-- Worker Completion Notes -->
+          <div class="form-group">
+            <label for="worker-notes">Worker Action Remarks / Field Notes</label>
+            <textarea id="worker-notes" rows="2"
+              placeholder="e.g., Cleared 50kg garbage dump, disinfected area with lime powder..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-success" id="btn-worker-submit-work"
+            style="width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 700;">
+            ✅ Submit Work for Admin Verification
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN SIDE-BY-SIDE VERIFICATION COMPARISON -->
+  <div class="modal-overlay" id="admin-verify-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🏛️ Side-by-Side Photo Verification Desk</div>
+        <button class="close-modal-btn" id="btn-close-admin-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div
+          style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <h3 id="admin-modal-cat" style="font-size: 1.3rem; color: #ffffff;">--</h3>
+            <div style="color: var(--text-gold); font-size: 0.88rem; font-weight: 700;" id="admin-modal-id">Ticket #--
+            </div>
+            <div style="font-size: 0.9rem; margin-top: 4px;" id="admin-modal-location">📍 Location: --</div>
+          </div>
+          <div id="admin-modal-status-badge"></div>
+        </div>
+
+        <!-- SIDE BY SIDE PHOTO COMPARISON GRID -->
+        <div class="photo-comparison-grid">
+          <!-- BEFORE PHOTO -->
+          <div class="photo-compare-card">
+            <div class="header before">⚠️ BEFORE Photo (Citizen Upload)</div>
+            <img id="admin-modal-before-img" src="" alt="Before Photo">
+            <div style="padding: 0.6rem; font-size: 0.8rem; color: var(--text-muted);" id="admin-modal-problem-desc">
+              Problem description...
+            </div>
+          </div>
+
+          <!-- AFTER PHOTO -->
+          <div class="photo-compare-card">
+            <div class="header after">✅ AFTER Photo (Worker Resolution Proof)</div>
+            <img id="admin-modal-after-img" src="" alt="After Photo">
+            <div style="padding: 0.6rem; font-size: 0.8rem; color: var(--text-muted);" id="admin-modal-worker-notes">
+              Worker notes...
+            </div>
+          </div>
+        </div>
+
+        <!-- Citizen Contact Details & Timeline -->
+        <div
+          style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border: 1px solid var(--border-color);">
+          <div>
+            <div><strong>Complainant Name:</strong> <span id="admin-modal-citizen-name">--</span></div>
+            <div><strong>Mobile Number:</strong> <span id="admin-modal-citizen-mobile">--</span></div>
+          </div>
+          <div>
+            <div><strong>Reported On:</strong> <span id="admin-modal-created-time">--</span></div>
+            <div><strong>Work Completed On:</strong> <span id="admin-modal-updated-time">--</span></div>
+          </div>
+        </div>
+
+        <!-- Approval Lock Banner -->
+        <div id="admin-modal-lock-notice" style="display: none; background: rgba(245, 158, 11, 0.18); border: 1.5px solid var(--accent-gold); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; color: #fef08a; font-weight: 700; margin-bottom: 1rem; text-align: center;">
+          ⚠️ APPROVAL LOCKED: Assigned field worker must first upload the AFTER photo proof and submit completed work before Master Admin can approve & verify closed.
+        </div>
+
+        <!-- Verification Actions -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;" id="admin-modal-action-row">
+          <button type="button" class="btn-secondary" id="btn-admin-send-msg-modal">
+            💬 Send Message to Worker
+          </button>
+          <button type="button" class="btn-success" id="btn-admin-approve">
+            ✅ Approve & Verify Closed
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN MESSAGE / DIRECTIVE TO WORKER -->
+  <div class="modal-overlay" id="admin-message-modal">
+    <div class="modal-box" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-title">💬 Dispatch Directive / Message to Field Worker</div>
+        <button class="close-modal-btn" id="btn-close-message-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="admin-message-form">
+          <input type="hidden" id="msg-ticket-id">
+
+          <div
+            style="background: rgba(0,0,0,0.3); padding: 0.85rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.88rem; border: 1px dashed var(--accent-gold);">
+            <div><strong>Ticket Reference:</strong> <span id="msg-ticket-code"
+                style="color: var(--text-gold);">--</span></div>
+            <div><strong>Assigned Ward:</strong> <span id="msg-worker-ward" style="color: #ffffff;">--</span></div>
+          </div>
+
+          <div class="form-group">
+            <label for="admin-msg-text">Admin Directive Message <span class="required">*</span></label>
+            <textarea id="admin-msg-text" rows="3"
+              placeholder="Type instructions for worker (e.g., Clear garbage dump near market gate before 10 AM, use disinfectant powder)..."
+              required></textarea>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <div style="font-size: 0.8rem; color: var(--text-gold); font-weight: 700; margin-bottom: 0.5rem;">⚡ 1-Click
+              Instant Dispatch Presets:</div>
+            <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              <button type="button" class="btn-secondary quick-msg-preset"
+                data-text="⚡ High Priority: Please clear site immediately before 10 AM."
+                style="font-size: 0.75rem; padding: 0.35rem 0.7rem; border-color: var(--accent-gold); color: var(--text-gold);">⚡
+                Instant Urgent Clearance</button>
+              <button type="button" class="btn-secondary quick-msg-preset"
+                data-text="🛠️ Equipment Notice: Use asphalt cold mix and compact properly."
+                style="font-size: 0.75rem; padding: 0.35rem 0.7rem;">🛠️ Instant Repair Spec</button>
+              <button type="button" class="btn-secondary quick-msg-preset"
+                data-text="🧪 Hygiene Directive: Spray bleaching/lime disinfectant after cleanup."
+                style="font-size: 0.75rem; padding: 0.35rem 0.7rem;">🧪 Instant Disinfectant Directive</button>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <button type="button" class="btn-secondary" id="btn-cancel-msg-modal">Cancel</button>
+            <button type="submit" class="btn-primary" style="width: auto; padding: 0.75rem 1.25rem;">
+              📩 Dispatch Message to Worker
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EMAIL OTP VERIFICATION DIALOG -->
+  <div class="modal-overlay" id="email-otp-modal">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title">📩 Email OTP Verification Desk</div>
+        <button class="close-modal-btn" id="btn-close-otp-modal">✕</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📧</div>
+        <h3 style="color: #ffffff; font-size: 1.15rem; margin-bottom: 0.25rem;">Enter 6-Digit Verification Code</h3>
+        <p style="color: var(--text-gold); font-size: 0.85rem; margin-bottom: 0.5rem;">
+          A 6-digit OTP code has been dispatched to <strong id="otp-target-email"
+            style="color: #ffffff;">tiruchengodemunico@gmail.com</strong>
+        </p>
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Official Dispatch Sender: <strong id="otp-sender-email" style="color: var(--accent-emerald);">tiruchengodemunico@gmail.com</strong> (Tiruchengode Municipal Corporation)
+        </div>
+
+        <!-- Instant Dispatched OTP Code Box -->
+        <div
+          style="background: rgba(16, 185, 129, 0.18); border: 1.5px solid var(--accent-emerald); padding: 0.9rem; border-radius: 8px; font-size: 0.88rem; color: #34d399; margin-bottom: 1.25rem;">
+          <div><strong>📩 Dispatched 6-Digit OTP Code:</strong></div>
+          <div style="font-size: 1.8rem; font-weight: 900; letter-spacing: 0.25em; color: #ffffff; margin: 6px 0;"
+            id="otp-display-code">------</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Dispatched from official email: tiruchengodemunico@gmail.com</div>
+        </div>
+
+        <form id="email-otp-form">
+          <div class="form-group">
+            <label for="otp-input-code">6-Digit OTP Code <span class="required">*</span></label>
+            <input type="text" id="otp-input-code" placeholder="Enter 6 digits" maxlength="6" pattern="[0-9]{6}"
+              style="text-align: center; font-size: 1.5rem; letter-spacing: 0.25em; font-weight: 800;" required>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <button type="button" class="btn-primary" id="btn-autofill-otp"
+              style="flex: 1.2; justify-content: center; font-size: 0.85rem; padding: 0.5rem;">
+              ⚡ Auto-Fill OTP Code
+            </button>
+            <button type="button" class="btn-secondary" id="btn-resend-otp"
+              style="flex: 1; justify-content: center; font-size: 0.82rem;">
+              🔄 Resend New OTP
+            </button>
+          </div>
+
+          <button type="submit" class="btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem;">
+            ✅ Verify OTP & Log In to Admin
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Municipal Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <span style="font-size: 1.3rem;">🏛️</span>
+        <div>
+          <div style="font-weight: 800; font-size: 1rem; color: #ffffff;">Tiruchengode Municipal Corporation</div>
+          <div style="font-size: 0.78rem; color: var(--text-muted);">Municipal Grievance Redressal System — Namakkal District, Tamil Nadu</div>
+        </div>
+      </div>
+      <div class="footer-contact">
+        <div style="font-size: 0.82rem; color: var(--text-gold); font-weight: 700; margin-bottom: 0.35rem;">📧 Official Contact Email:</div>
+        <a href="mailto:tiruchengodemunico@gmail.com" class="footer-email-link">
+          tiruchengodemunico@gmail.com
+        </a>
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">For complaints, inquiries & official correspondence</div>
+      </div>
+      <div class="footer-copy">
+        &copy; 2026 Tiruchengode Municipal Corporation. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Live Toast Alert Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- MODAL: WORKER COMPLAINT INSPECTION & DESK DIALOGUE -->
+  <div class="modal-overlay" id="worker-inspect-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">👷 Worker Side-by-Side Field Inspection Desk</div>
+        <button class="close-modal-btn" id="btn-close-worker-inspect-modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <h3 id="worker-inspect-cat" style="font-size: 1.3rem; color: #ffffff;">--</h3>
+            <div style="color: var(--text-gold); font-size: 0.88rem; font-weight: 700;" id="worker-inspect-id">Ticket #--</div>
+            <div style="font-size: 0.9rem; margin-top: 4px;" id="worker-inspect-location">📍 Location: --</div>
+          </div>
+          <div id="worker-inspect-status-badge"></div>
+        </div>
+
+        <!-- SIDE BY SIDE PHOTO COMPARISON GRID FOR WORKER -->
+        <div class="photo-comparison-grid">
+          <!-- BEFORE PHOTO -->
+          <div class="photo-compare-card">
+            <div class="header before">⚠️ BEFORE Photo (Citizen Upload)</div>
+            <img id="worker-inspect-before-img" src="" alt="Before Photo">
+            <div style="padding: 0.6rem; font-size: 0.8rem; color: var(--text-muted);" id="worker-inspect-problem-desc">
+              Problem description...
+            </div>
+          </div>
+
+          <!-- AFTER PHOTO -->
+          <div class="photo-compare-card">
+            <div class="header after">✅ AFTER Photo (Worker Resolution Proof)</div>
+            <img id="worker-inspect-after-img" src="" alt="After Photo">
+            <div style="padding: 0.6rem; font-size: 0.8rem; color: var(--text-muted);" id="worker-inspect-notes">
+              Worker notes...
+            </div>
+          </div>
+        </div>
+
+        <!-- Citizen Contact Details & Admin Directive Box -->
+        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border: 1px solid var(--border-color);">
+          <div>
+            <div><strong>Complainant Name:</strong> <span id="worker-inspect-citizen-name">--</span></div>
+            <div><strong>Mobile Number:</strong> <span id="worker-inspect-citizen-mobile">--</span></div>
+          </div>
+          <div>
+            <div><strong>Reported On:</strong> <span id="worker-inspect-created-time">--</span></div>
+            <div><strong>Last Updated:</strong> <span id="worker-inspect-updated-time">--</span></div>
+          </div>
+        </div>
+
+        <div id="worker-inspect-directive-container" style="display: none; margin-bottom: 1rem;">
+          <!-- Directive message rendered dynamically -->
+        </div>
+
+        <!-- Worker Action Buttons -->
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap;" id="worker-inspect-action-row">
+          <button type="button" class="btn-secondary" id="btn-worker-inspect-map">
+            📍 View Live GPS Location Map
+          </button>
+          <button type="button" class="btn-success" id="btn-worker-inspect-complete">
+            📸 Upload AFTER Photo & Complete Work
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS for Maps -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- EmailJS SDK for Live Email OTP Dispatch -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <!-- Supabase Cloud DB SDK for Instant Cloud REST API Sync -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Application JS Logic -->
+  <script src="app.js"></script>
+</body>
+
+</html>
