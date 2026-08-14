@@ -17,8 +17,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = '127.0.0.1';
 
-const SUPABASE_URL = 'https://ttplorqgsabmjbbjlcis.supabase.co';
-const SUPABASE_KEY = 'prj_SrLCceVVrHzzG9Tj1z9SMnTxTPOX';
+const SUPABASE_URL = 'https://ujhijbtnymlslvfzquag.supabase.co/rest/v1/';
+const SUPABASE_KEY = 'sb_publishable_NpPOezK4sy3N7ash-e24vA_es15za-O';
 const SUPABASE_REST_BASE = 'https://ttplorqgsabmjbbjlcis.supabase.co/rest/v1';
 
 // Secret Key Resolution
@@ -27,7 +27,7 @@ function getJWTSecret() {
   const secretFile = path.join(__dirname, 'jwt_secret.txt');
   if (fs.existsSync(secretFile)) return fs.readFileSync(secretFile, 'utf-8').trim();
   const ephemeralSecret = crypto.randomBytes(32).toString('hex');
-  try { fs.writeFileSync(secretFile, ephemeralSecret, { encoding: 'utf-8', flag: 'w' }); } catch (e) {}
+  try { fs.writeFileSync(secretFile, ephemeralSecret, { encoding: 'utf-8', flag: 'w' }); } catch (e) { }
   return ephemeralSecret;
 }
 
